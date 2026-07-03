@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Quix Assessment Portal - Modern, responsive, and secure online examination platform for technical aptitude and programming evaluations.">
+  <title>Quix Assessment Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Load jsPDF library via CDN for client-side PDF downloads -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Ambient starfield particles canvas -->
+  <canvas id="particle-canvas"></canvas>
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="app-container">
+    
+    <!-- Top global navigation header -->
+    <header>
+      <div class="brand-title" id="brand-logo">
+        QUIX EXAMS
+      </div>
+      
+      <div style="display:flex; align-items:center; gap:12px;">
+        <!-- Header user profile state widget -->
+        <div class="user-status-display" id="header-profile-widget" style="display:none;">
+          <div style="display:flex; flex-direction:column; text-align:right;">
+            <span class="widget-name" style="font-weight:600;">Student Name</span>
+            <span class="widget-role" style="font-size:0.75rem; color:var(--text-muted);">Register No</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 1. LOGIN SCREEN -->
+    <section id="login-screen" class="screen active">
+      <div class="login-screen-container">
+        <div class="glass-card login-card">
+          <div class="login-header-tabs">
+            <div class="login-tab active" id="tab-student">Student Portal</div>
+            <div class="login-tab" id="tab-admin">Admin Portal</div>
+          </div>
+          
+          <form id="login-form">
+            <!-- Student inputs panel -->
+            <div id="group-student-fields" style="display:flex; flex-direction:column;">
+              <!-- Student Sub-Tabs Selector -->
+              <div class="student-sub-tabs" style="display:flex; justify-content:center; gap:25px; margin-bottom:18px; border-bottom:1px solid var(--border-color); padding-bottom:8px; width:100%;">
+                <div class="sub-tab active" id="sub-tab-register" style="cursor:pointer; color:var(--primary-cyan); font-weight:600; font-size:0.9rem; padding: 2px 6px;">Register</div>
+                <div class="sub-tab" id="sub-tab-login" style="cursor:pointer; color:var(--text-muted); font-size:0.9rem; padding: 2px 6px;">Login</div>
+              </div>
+
+              <div class="form-group" id="form-group-student-name">
+                <label for="student-name">Student Name</label>
+                <input type="text" id="student-name" class="form-input" placeholder="e.g. John Doe">
+              </div>
+              <div class="form-group" id="form-group-student-reg" style="display:none;">
+                <label for="student-reg">Register Number</label>
+                <input type="text" id="student-reg" class="form-input" placeholder="e.g. 2026CSE001">
+              </div>
+              <div class="form-group" id="form-group-student-email">
+                <label for="student-email">Email Address</label>
+                <input type="email" id="student-email" class="form-input" placeholder="e.g. john@university.edu">
+              </div>
+              <div class="form-group">
+                <label for="student-pass">Exam Password</label>
+                <input type="password" id="student-pass" class="form-input" placeholder="••••••••">
+              </div>
+            </div>
+            
+            <!-- Admin inputs panel -->
+            <div id="group-admin-fields" style="display:none; flex-direction:column;">
+              <div class="form-group">
+                <label for="admin-user">Admin Username</label>
+                <input type="text" id="admin-user" class="form-input" placeholder="admin@2026">
+              </div>
+              <div class="form-group">
+                <label for="admin-pass">Password</label>
+                <input type="password" id="admin-pass" class="form-input" placeholder="••••••••">
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-cyan" style="width:100%; margin-top:15px;" id="login-submit-btn">
+              Register & Start Test
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1.5 STUDENT DASHBOARD SCREEN -->
+    <section id="dashboard-screen" class="screen">
+      <div class="glass-card dashboard-container" style="width: 100%; max-width: 900px; margin: 0 auto;">
+        <h2 style="font-family:var(--font-title); font-size:1.8rem; background:linear-gradient(90deg, var(--primary-cyan), var(--primary-violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:700; margin-bottom:5px;">
+          Student Dashboard
+        </h2>
+        <p style="color:var(--text-secondary); margin-bottom:25px; font-size:0.95rem;">Welcome to your assessment portal. View your test status below.</p>
+        
+        <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <!-- Left: Available Tests -->
+          <div class="glass-card dashboard-card" style="display:flex; flex-direction:column; justify-content:space-between; border-color: var(--border-color);">
+            <div>
+              <h3 style="font-family:var(--font-title); color:var(--primary-cyan); font-size:1.2rem; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                <span>📝</span> Active Assessment
+              </h3>
+              <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:10px; padding:15px; margin-bottom:15px;">
+                <h4 style="font-size:1rem; font-weight:600; color:#fff; margin-bottom:8px;">Aptitude & Programming Assessment</h4>
+                <div style="font-size:0.85rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:6px;">
+                  <div>⏱️ <strong>Duration:</strong> 45 Minutes</div>
+                  <div>📊 <strong>Questions:</strong> <span id="dash-test-qcount">29</span> Questions</div>
+                  <div>🏆 <strong>Max Marks:</strong> <span id="dash-test-marks">50</span> Marks</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button class="btn btn-cyan" id="dash-btn-view-test" style="width:100%;">View Details & Start</button>
+              <div id="dash-test-completed-msg" style="display:none; text-align:center; color:var(--correct-green); font-weight:600; font-size:0.9rem; margin-top:10px;">
+                ✓ Test Completed & Submitted
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right: Previous Test Details -->
+          <div class="glass-card dashboard-card" style="border-color: var(--border-color); display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <h3 style="font-family:var(--font-title); color:var(--primary-violet); font-size:1.2rem; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                <span>⏱️</span> Attended Test History
+              </h3>
+              
+              <div id="dash-no-history" style="text-align:center; color:var(--text-muted); font-style:italic; padding:30px 10px;">
+                No previous tests attended.
+              </div>
+              
+              <div id="dash-history-details" style="display:none; background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:10px; padding:15px; font-size:0.85rem; flex-direction:column; gap:8px;">
+                <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Marks Secured:</span><strong id="dash-hist-marks" style="color:var(--primary-cyan);">0 / 50</strong></div>
+                <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Percentage:</span><strong id="dash-hist-percent">0%</strong></div>
+                <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Time Taken:</span><strong id="dash-hist-duration">0m 0s</strong></div>
+                <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Result Status:</span><strong id="dash-hist-status">FAILED</strong></div>
+                <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Submitted At:</span><strong id="dash-hist-date" style="color:var(--text-muted);">N/A</strong></div>
+              </div>
+            </div>
+            
+            <div id="dash-history-actions" style="display:none; margin-top:15px; display:flex; flex-direction:column; gap:8px;">
+              <button class="btn btn-glass" id="dash-btn-download-pdf" style="width:100%;">Download Scorecard (PDF)</button>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display:flex; justify-content:flex-end; margin-top:25px; border-top:1px solid var(--border-color); padding-top:20px;">
+          <button class="btn btn-glass btn-logout">Logout</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. INSTRUCTIONS SCREEN -->
+    <section id="instruction-screen" class="screen">
+      <div class="glass-card instruction-container">
+        <h2 class="inst-title">Aptitude & Programming Assessment</h2>
+        
+        <div class="inst-grid">
+          <div class="inst-stat-card">
+            <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Questions</span>
+            <div class="inst-stat-val" id="inst-stat-qcount">29 Total</div>
+          </div>
+          <div class="inst-stat-card">
+            <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Duration</span>
+            <div class="inst-stat-val">45 Minutes</div>
+          </div>
+          <div class="inst-stat-card">
+            <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Max Marks</span>
+            <div class="inst-stat-val" id="inst-stat-marks">50 Marks</div>
+          </div>
+        </div>
+        
+        <div style="background:rgba(255,255,255,0.015); border:1px solid var(--border-color); border-radius:10px; padding:20px; margin-bottom:20px;">
+          <h4 style="font-family:var(--font-title); font-size:0.9rem; color:var(--primary-cyan); border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:12px;">
+            IMPORTANT EXAM REGULATORY INSTRUCTIONS
+          </h4>
+          <ul class="inst-list">
+            <li><strong>Exam Schedule</strong>: Open from <strong>8:00 PM – 9:30 PM</strong>. Test time runs for exactly 45 minutes from launch.</li>
+            <li><strong>Marking Scheme</strong>:
+              <ul style="padding-left:15px; margin-top:5px; font-size:0.85rem; display:flex; flex-direction:column; gap:4px;">
+                <li>• Section A, C, E, F: <strong>1 to 2.5 marks each (MCQs)</strong></li>
+                <li>• Section B: <strong>2 to 3 marks each (HTML Practical)</strong></li>
+                <li>• Section D: <strong>3 to 4 marks each (Python Programming)</strong></li>
+                <li>• <strong>No negative marking</strong> is active for incorrect responses.</li>
+              </ul>
+            </li>
+            <li><strong>Security full-screen</strong>: Launching the exam immediately prompts full-screen mode. Fullscreen exits are logged.</li>
+            <li><strong>Infractions Tracking</strong>: Copy/Paste, text selection, and right-click menus are disabled. Tab switches are monitored.</li>
+            <li><strong>Automatic Submission</strong>: Exiting full-screen or switching browser tabs logs a warning. **On the 3rd warning, the exam automatically terminates and submits.**</li>
+            <li><strong>Timer auto-submit</strong>: The exam automatically submits and logs answers once the 45-minute timer terminates. Do not refresh.</li>
+          </ul>
+        </div>
+        
+        <label class="checkbox-group">
+          <input type="checkbox" class="checkbox-input" id="consent-checkbox">
+          <span style="font-size:0.9rem; color:var(--text-secondary);">I have read and understood all the guidelines and instructions.</span>
+        </label>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+          <button class="btn btn-glass" id="btn-instruction-back">Back to Dashboard</button>
+          <button class="btn btn-cyan" id="btn-start-exam" disabled>Start Exam</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ASSESSMENT TESTING PAGE -->
+    <section id="exam-screen" class="screen">
+      
+      <!-- Sticky Student profile info bar and timer -->
+      <div class="sticky-timer-header">
+        <div class="header-status-panel">
+          <div class="student-meta-widget">
+            <span class="student-meta-name" id="exam-student-name">Loading Student...</span>
+            <span class="student-meta-reg" id="exam-student-reg">2026IT001</span>
+          </div>
+          
+          <div class="exam-timer" id="exam-timer-box">
+            <span id="exam-timer-num">45:00</span>
+          </div>
+        </div>
+        
+        <!-- Progress bar and indicators row -->
+        <div class="progress-container-row">
+          <div class="progress-label-val">
+            <span>Progress: <strong id="exam-progress-num">0</strong> of <strong id="exam-progress-total">29</strong> Questions Completed</span>
+          </div>
+          <div class="progress-bar-outer">
+            <div class="progress-bar-inner" id="exam-header-progress"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Two-column Exam Room layout -->
+      <div class="exam-layout">
+        
+        <!-- Column 1: Active question box -->
+        <div class="exam-main-panel">
+          <div class="glass-card question-card">
+            <div>
+              <span class="section-indicator-badge" id="exam-section-badge">SECTION A – Number System</span>
+              <span style="float:right; font-family:var(--font-title); font-size:0.85rem; color:var(--text-muted);">Q. No. <strong id="exam-q-idx">1</strong></span>
+            </div>
+            
+            <div id="exam-question-details" style="flex:1; display:flex; flex-direction:column;">
+              <!-- Loaded dynamically by JS depending on MCQ / Drag-Drop / Touch events -->
+            </div>
+          </div>
+          
+          <!-- Exam controls navigation panel -->
+          <div class="exam-nav-footer">
+            <button class="btn btn-glass" id="exam-prev-btn" disabled>Previous</button>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-glass" id="exam-review-btn">Mark for Review</button>
+              <button class="btn btn-magenta" id="exam-submit-btn">Submit Test</button>
+            </div>
+            <button class="btn btn-cyan" id="exam-next-btn">Save & Next</button>
+          </div>
+        </div>
+        
+        <!-- Column 2: Question Section-wise Navigation Grid Sidebar -->
+        <div class="glass-card exam-sidebar-palette">
+          <div class="sidebar-palette-title">Sections Palette</div>
+          
+          <div class="sidebar-sections-wrapper" id="sidebar-sections-list">
+            <!-- Populated dynamically with sections A to J and circle buttons -->
+          </div>
+          
+          <!-- Legend markers -->
+          <div class="palette-legend">
+            <div class="legend-item">
+              <div class="legend-dot curr"></div>
+              <span>Current</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot ans"></div>
+              <span>Answered</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot mrk"></div>
+              <span>Reviewing</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot vis"></div>
+              <span>Unanswered</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. SCORECARD RESULT SHEET SCREEN -->
+    <section id="completed-screen" class="screen">
+      <div class="glass-card completed-container">
+        <h2 style="font-family:var(--font-title); font-size:2rem; color:var(--primary-cyan); margin-bottom:8px; margin-top:15px;">Assessment Completed</h2>
+        <p style="color:var(--text-secondary); margin-bottom:20px; font-size:0.95rem;">Your scorecard is computed. Verify your test performance below.</p>
+        
+        <!-- Violation Alert banner if forced submitted -->
+        <div id="exam-auto-sub-notice" style="display:none; background:rgba(255, 23, 68, 0.1); border:1px solid var(--incorrect-red); border-radius:10px; padding:12px; color:var(--incorrect-red); font-size:0.85rem; margin-bottom:20px; font-weight:600;">
+          Notice: This test was auto-submitted due to reaching the maximum threshold of security warnings.
+        </div>
+
+        <div class="glass-card" style="text-align:left; border-color:var(--border-color-glow);">
+          <h4 style="font-family:var(--font-title); font-size:0.85rem; color:var(--text-muted); border-bottom:1px solid var(--border-color); padding-bottom:6px; margin-bottom:15px; text-transform:uppercase;">
+            Scorecard details
+          </h4>
+          
+          <div style="display:flex; flex-direction:column; gap:8px; font-size:0.95rem;">
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Student Name:</span><strong id="completed-student-name">Student Name</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Register Number:</span><strong id="completed-student-reg" style="font-family:monospace;">2026IT001</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Email Address:</span><strong id="completed-student-email">email@test.edu</strong></div>
+          </div>
+          
+          <div class="completed-results-grid">
+            <div class="completed-stat-card">
+              <span class="completed-stat-lbl">Questions Attempted</span>
+              <div class="completed-stat-val" id="completed-attempted">0 / 29</div>
+            </div>
+            <div class="completed-stat-card">
+              <span class="completed-stat-lbl">Correct Answers</span>
+              <div class="completed-stat-val" id="completed-correct" style="color:var(--correct-green);">0</div>
+            </div>
+            <div class="completed-stat-card">
+              <span class="completed-stat-lbl">Incorrect / Skipped</span>
+              <div class="completed-stat-val" id="completed-wrong" style="color:var(--incorrect-red);">0</div>
+            </div>
+            <div class="completed-stat-card">
+              <span class="completed-stat-lbl">Marks Obtained</span>
+              <div class="completed-stat-val" id="completed-marks" style="color:var(--primary-cyan);">0 / 50</div>
+            </div>
+            <div class="completed-stat-card">
+              <span class="completed-stat-lbl">Percentage Score</span>
+              <div class="completed-stat-val" id="completed-percentage">0%</div>
+            </div>
+            <div class="completed-stat-card">
+              <span class="completed-stat-lbl">Evaluation Grade</span>
+              <div style="margin-top:4px;"><span class="score-badge" id="completed-status-badge">FAILED</span></div>
+            </div>
+          </div>
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; border-top:1px solid var(--border-color); padding-top:15px; margin-top:10px;">
+            <span style="color:var(--text-muted);">Duration Taken: <strong id="completed-duration" style="color:var(--text-primary);">0s</strong></span>
+          </div>
+        </div>
+        
+        <div style="display:flex; justify-content:center; gap:15px; margin-top:30px;">
+          <button class="btn btn-cyan" id="btn-download-pdf">Download Result (PDF)</button>
+          <button class="btn btn-glass btn-logout" id="btn-exit-test">Exit Test</button>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- 5. ADMIN DASHBOARD SCREEN -->
+    <section id="admin-dashboard" class="screen">
+      <div class="glass-card" style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h2 style="font-family:var(--font-title); font-size:1.6rem; background:linear-gradient(90deg, var(--primary-cyan), var(--primary-violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:700;">
+            EXAMINATION MONITORING HUB
+          </h2>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Real-time Student Activity Feed</span>
+        </div>
+        <button class="btn btn-glass btn-small btn-logout">Logout</button>
+      </div>
+      
+      <!-- Statistics cards row -->
+      <div class="admin-stats-row">
+        <div class="glass-card stat-box">
+          <span class="stat-box-lbl">Total Completed</span>
+          <div class="stat-box-val" id="stat-total-submissions">0</div>
+        </div>
+        <div class="glass-card stat-box">
+          <span class="stat-box-lbl">Average Score</span>
+          <div class="stat-box-val" id="stat-avg-score">0 / 50</div>
+        </div>
+        <div class="glass-card stat-box">
+          <span class="stat-box-lbl">Highest Grade</span>
+          <div class="stat-box-val" id="stat-highest-score">0 / 50</div>
+        </div>
+        <div class="glass-card stat-box">
+          <span class="stat-box-lbl">Pass Rate (>=60%)</span>
+          <div class="stat-box-val" id="stat-pass-rate">0%</div>
+        </div>
+      </div>
+      
+      <!-- Table filters row -->
+      <div class="admin-controls">
+        <div class="search-wrapper">
+          <input type="text" id="admin-search-input" class="form-input search-input" placeholder="Search by name, email, or register no...">
+        </div>
+        <button class="btn btn-magenta btn-small" id="admin-reset-db-btn">Reset All Exam Data</button>
+      </div>
+      
+      <!-- Real-time submissions log table -->
+      <div class="glass-card admin-table-card">
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Register No</th>
+                <th>Marks Secured</th>
+                <th>Percentage (Result)</th>
+                <th>Duration taken</th>
+                <th>Completion Date</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-tbody">
+              <tr>
+                <td colspan="6" style="text-align:center; color:var(--text-muted); font-style:italic; padding:20px;">
+                  Waiting for student assessment submissions...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- SECURITY WARNING POPUP OVERLAY -->
+  <div class="modal-overlay" id="security-warning-modal">
+    <div class="modal-content glass-card" style="border-color:var(--incorrect-red); box-shadow:var(--glow-red);">
+      <h3 class="warning-modal-header">
+        SECURITY VIOLATION DETECTED
+      </h3>
+      
+      <p style="color:var(--text-primary); font-weight:600; margin-bottom:12px; font-size:0.95rem;" id="security-breach-reason">
+        A security infraction has been triggered.
+      </p>
+      
+      <div style="background:rgba(255,23,68,0.06); border:1px solid rgba(255,23,68,0.2); border-radius:8px; padding:15px; margin-bottom:20px;">
+        <ul class="warning-bullets">
+          <li>Full-screen mode is mandatory for this assessment.</li>
+          <li>Do not minimize, Alt+Tab, switch tabs, or click outside the test window.</li>
+          <li>Maximum 2 Warnings Allowed. The 3rd warning logs an infraction and auto-submits.</li>
+        </ul>
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong id="security-warning-stage" style="color:var(--incorrect-red); text-shadow:0 0 5px rgba(255,23,68,0.3); font-family:var(--font-title);">
+          Warning 1 of 2
+        </strong>
+        <button class="btn btn-cyan btn-small" id="btn-return-fullscreen">
+          Return to Test
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAM CONFIRMATION OVERLAY MODAL -->
+  <div class="modal-overlay" id="submit-confirm-modal">
+    <div class="modal-content glass-card">
+      <div class="close-btn" id="close-submit-modal">&times;</div>
+      <h3 style="font-family:var(--font-title); color:var(--primary-cyan); margin-bottom:15px;">Finalize Submission?</h3>
+      <p style="color:var(--text-secondary); margin-bottom:12px; line-height:1.5;">
+        You have answered <strong id="modal-answered-count" style="color:#fff;">0</strong> questions out of <strong id="modal-total-count" style="color:#fff;">29</strong>. 
+        (<strong id="modal-unanswered-count" style="color:var(--primary-magenta);">29</strong> left unanswered).
+      </p>
+      <p id="modal-unanswered-warning" style="color:var(--incorrect-red); font-size:0.85rem; margin-bottom:20px; font-weight:600; display:none;">
+        Warning: You have unanswered questions! Unanswered questions will receive 0 marks.
+      </p>
+      <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px;">
+        Are you sure you want to lock and submit your answers? You cannot edit or re-enter the test after submission.
+      </p>
+      
+      <div style="display:flex; justify-content: flex-end; gap:12px;">
+        <button class="btn btn-glass btn-small" id="btn-cancel-submit">Review Answers</button>
+        <button class="btn btn-cyan btn-small" id="btn-confirm-submit">Yes, Submit Exam</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Toast messages center -->
+  <div class="toast-container" id="toast-holder"></div>
+
+  <!-- Core loader script -->
+  <script type="module" src="app.js?v=2026_07_03_v3"></script>
+</body>
+</html>
