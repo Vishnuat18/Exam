@@ -51,10 +51,6 @@
   user-select: none;
 }
 
-input, textarea, select, option {
-  user-select: auto;
-}
-
 body {
   font-family: var(--font-body);
   background-color: var(--bg-dark);
@@ -65,7 +61,7 @@ body {
   display: flex;
   flex-direction: column;
 }
-/*  */
+
 /* Background canvas particles */
 #particle-canvas {
   position: fixed;

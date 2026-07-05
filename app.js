@@ -1,4 +1,4 @@
-import { EXAM_QUESTIONS, EXAM_SECTIONS } from "./quiz-data.js?v=2026_07_03_v3";
+import { EXAM_QUESTIONS, EXAM_SECTIONS } from "./quiz-data.js?v=2026_07_02_v2";
 import {
   registerStudent,
   loginStudent,
@@ -277,10 +277,6 @@ function disableSecurityMeters() {
 }
 
 function blockEvent(e) {
-  const tag = e.target.tagName;
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'OPTION') {
-    if (e.type === 'selectstart') return;
-  }
   e.preventDefault();
 }
 
